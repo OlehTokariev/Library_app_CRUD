@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d743b4cd-c3cd-410a-b17e-4b327bb9464c" name="Changes" comment="Initial commit: Spring Boot CRUD application with PostgreSQL">
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -115,7 +116,7 @@
       <workItem from="1730452620373" duration="40649000" />
       <workItem from="1730897296656" duration="19000" />
       <workItem from="1730897337598" duration="99000" />
-      <workItem from="1730897444284" duration="1861000" />
+      <workItem from="1730897444284" duration="2206000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit: Spring Boot CRUD application with PostgreSQL">
       <option name="closed" value="true" />
