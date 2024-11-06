@@ -5,10 +5,9 @@ import lombok.*;
 
 @Data
 @AllArgsConstructor
-@Getter
-@Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "book")
 public class Book {
 
     @Id
@@ -24,7 +23,7 @@ public class Book {
     @Column(nullable = false)
     private int year;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private Author author;
 }

@@ -1,8 +1,12 @@
 package library.example.libraryEdu.controller;
 
+import jakarta.persistence.EntityNotFoundException;
+import library.example.libraryEdu.dto.BookDTO;
+import library.example.libraryEdu.exception.APIError;
+import library.example.libraryEdu.exception.NotFoundException;
 import library.example.libraryEdu.model.Book;
 import library.example.libraryEdu.service.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,58 +18,44 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/books")
+@RequiredArgsConstructor
 public class BookController {
 
     private final BookService bookService;
 
-    @Autowired
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
-
-    // Получение всех книг
     @GetMapping
-    public List<Book> getAllBooks() {
+    public List<BookDTO> getAllBooks() {
         return bookService.getAllBooks();
     }
-
-    // Получение книги по ID
     @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById( @PathVariable Long id) {
-        Optional<Book> book = bookService.getBookById(id);
-        return book.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
+        return bookService.getBookById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
-
-    // Создание новой книги
     @PostMapping
-    public ResponseEntity<List<Book>> createBooks(@RequestBody List<Book> books) {
-        List<Book> savedBooks = books.stream()
-                .map(bookService::createBook)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(savedBooks, HttpStatus.CREATED);
+    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO, @RequestParam(required = false) String genre) {
+        BookDTO createdBook = bookService.createBook(bookDTO, genre);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
     }
 
-    // Обновление существующей книги по ID
-    @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable Long id, @Valid @RequestBody Book bookDetails) {
-        try {
-            Book updatedBook = bookService.updateBook(id, bookDetails);
-            return ResponseEntity.ok(updatedBook);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    @PatchMapping("/{id}")
+    public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @RequestBody BookDTO bookDTO) {
+        BookDTO updatedBook = bookService.updateBook(id, bookDTO);
+        return ResponseEntity.ok(updatedBook);
     }
 
-    // Удаление книги по ID
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBook(@PathVariable Long id) {
-        try {
-            bookService.deleteBook(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Book with id " + id + " not found");
-        }
+        bookService.deleteBook(id);
+        return ResponseEntity.ok("Book with id " + id + " has been successfully deleted.");
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public APIError handleNotFoundException(NotFoundException exception) {
+        return new APIError(exception.getMessage(), HttpStatus.NOT_FOUND.value());
     }
 }
 

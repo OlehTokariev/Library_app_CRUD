@@ -5,30 +5,32 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
-@Getter
-@Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "author")
 public class Author {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    @Column(name = "firstname")
+    @Column(nullable = false)
     private String firstname;
 
     @NotNull
-    @Column(name = "lastname")
+    @Column(nullable = false)
     private String lastname;
 
     @NotNull
-    @Column(name = "birthdate")
+    @Column(nullable = false)
     private LocalDate birthdate;
 
-    // Getters и Setters
+    @OneToMany(mappedBy = "author", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = false)
+    private List<Book> books;
 }

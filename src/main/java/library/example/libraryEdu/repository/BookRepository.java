@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
-    // Мои методы в будущем
+    boolean existsByAuthorId(Long authorId);
 }
+

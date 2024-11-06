@@ -1,8 +1,13 @@
 package library.example.libraryEdu.controller;
 
+import jakarta.persistence.EntityNotFoundException;
+import library.example.libraryEdu.dto.AuthorDTO;
+import library.example.libraryEdu.exception.APIError;
+import library.example.libraryEdu.exception.AuthorInUseException;
+import library.example.libraryEdu.exception.NotFoundException;
 import library.example.libraryEdu.model.Author;
 import library.example.libraryEdu.service.AuthorService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,53 +18,52 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/authors")
+@RequiredArgsConstructor
 public class AuthorController {
     private final AuthorService authorService;
 
-    @Autowired
-    public AuthorController(AuthorService authorService) {
-        this.authorService = authorService;
-    }
 
-    // Метод - получить всех авторов
     @GetMapping
-    public List<Author> getAllAuthors() {
+    public List<AuthorDTO> getAllAuthors() {
         return authorService.getAllAuthors();
     }
 
-    // Получить автора по айди
     @GetMapping("/{id}")
-    public ResponseEntity<Author> getAuthorById(@PathVariable Long id) {
-        Optional<Author> author = authorService.getAuthorById(id);
-        return author.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    public ResponseEntity<AuthorDTO> getAuthorById(@PathVariable Long id) {
+        return authorService.getAuthorById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    // Создать автора по айди
     @PostMapping
-    public ResponseEntity<Author> createAuthor(@Valid @RequestBody Author author) {
-        Author createdAuthor = authorService.createAuthor(author);
+    public ResponseEntity<AuthorDTO> createAuthor(@RequestBody AuthorDTO authorDTO) {
+        AuthorDTO createdAuthor = authorService.createAuthor(authorDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAuthor);
     }
 
-    // Обновлю автора по айди
-    @PutMapping("/{id}")
-    public ResponseEntity<Author> updateAuthor(@PathVariable Long id, @Valid @RequestBody Author authorDetails) {
-        try {
-            Author updatedAuthor = authorService.updateAuthor(id, authorDetails);
-            return ResponseEntity.ok(updatedAuthor);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    @PatchMapping ("/{id}")
+    public ResponseEntity<AuthorDTO> updateAuthor(@PathVariable Long id, @RequestBody AuthorDTO authorDTO) {
+        AuthorDTO updatedAuthor = authorService.updateAuthor(id, authorDTO);
+        return ResponseEntity.ok(updatedAuthor);
     }
 
-    // Удаляю автора по айди
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAuthor(@PathVariable Long id) {
-        try {
-            authorService.deleteAuthor(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<String> deleteAuthor(@PathVariable Long id) {
+        authorService.deleteAuthor(id);
+        return ResponseEntity.ok("Author with id " + id + " has been successfully deleted.");
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public APIError handleNotFoundException(NotFoundException exception) {
+        return new APIError(exception.getMessage(), HttpStatus.NOT_FOUND.value());
+    }
+
+    @ExceptionHandler(AuthorInUseException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public APIError handleAuthorInUseException(AuthorInUseException exception) {
+        return new APIError(exception.getMessage(), HttpStatus.BAD_REQUEST.value());
     }
 }

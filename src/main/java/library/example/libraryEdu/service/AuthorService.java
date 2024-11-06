@@ -1,55 +1,81 @@
 package library.example.libraryEdu.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import library.example.libraryEdu.dto.AuthorDTO;
+import library.example.libraryEdu.exception.AuthorInUseException;
+import library.example.libraryEdu.exception.NotFoundException;
 import library.example.libraryEdu.model.Author;
 import library.example.libraryEdu.repository.AuthorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
-
-    @Autowired
-    public AuthorService(AuthorRepository authorRepository) {
-        this.authorRepository = authorRepository;
+    private AuthorDTO convertToDTO(Author author) {
+        return new AuthorDTO(author.getFirstname(), author.getLastname(), author.getBirthdate());
     }
 
-    // Получение всех авторов
-    public List<Author> getAllAuthors() {
-        return authorRepository.findAll();
+    public List<AuthorDTO> getAllAuthors() {
+        return authorRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    // Получение автора по ID
-    public Optional<Author> getAuthorById(Long id) {
-        return authorRepository.findById(id);
+    public Optional<AuthorDTO> getAuthorById(Long id) {
+        return authorRepository.findById(id)
+                .map(this::convertToDTO);
     }
 
-    // Создание нового автора
-    public Author createAuthor(Author author) {
-        return authorRepository.save(author);
-    }
+    public AuthorDTO createAuthor(AuthorDTO authorDTO) {
+        Optional<Author> existingAuthor = authorRepository
+                .findByFirstnameAndLastname(authorDTO.getFirstname(), authorDTO.getLastname());
 
-    // Обновление существующего автора
-    public Author updateAuthor(Long id, Author authorDetails) {
-        Optional<Author> optionalAuthor = authorRepository.findById(id);
-        if (optionalAuthor.isPresent()) {
-            Author existingAuthor = optionalAuthor.get();
-            existingAuthor.setFirstname(authorDetails.getFirstname());
-            existingAuthor.setLastname(authorDetails.getLastname());
-            existingAuthor.setBirthdate(authorDetails.getBirthdate());
-            return authorRepository.save(existingAuthor);
-        } else {
-            throw new RuntimeException("Author not found with id " + id);
+        if (existingAuthor.isPresent()) {
+            return convertToDTO(existingAuthor.get());
         }
+
+        Author author = new Author();
+        author.setFirstname(authorDTO.getFirstname());
+        author.setLastname(authorDTO.getLastname());
+        author.setBirthdate(authorDTO.getBirthdate());
+        Author savedAuthor = authorRepository.save(author);
+        return convertToDTO(savedAuthor);
     }
 
-    // Удаление автора
+    public AuthorDTO updateAuthor(Long id, AuthorDTO authorDTO) {
+        Author existingAuthor = authorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
+
+        if (authorDTO.getFirstname() != null) {
+            existingAuthor.setFirstname(authorDTO.getFirstname());
+        }
+        if (authorDTO.getLastname() != null) {
+            existingAuthor.setLastname(authorDTO.getLastname());
+        }
+        if (authorDTO.getBirthdate() != null) {
+            existingAuthor.setBirthdate(authorDTO.getBirthdate());
+        }
+
+        Author updatedAuthor = authorRepository.save(existingAuthor);
+        return convertToDTO(updatedAuthor);
+    }
+
     public void deleteAuthor(Long id) {
-        authorRepository.deleteById(id);
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
+
+        if (author.getBooks() != null && !author.getBooks().isEmpty()) {
+            throw new AuthorInUseException("Cannot delete author with id " + id + " because they are associated with existing books.");
+        }
+
+        authorRepository.delete(author);
     }
 }
 
