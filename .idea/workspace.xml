@@ -5,7 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d743b4cd-c3cd-410a-b17e-4b327bb9464c" name="Changes" comment="Initial commit: Spring Boot CRUD application with PostgreSQL">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/LibraryEduApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/LibraryEduApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/controller/AuthorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/controller/AuthorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/controller/BookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/controller/BookController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/dto/AuthorDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/dto/AuthorDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/dto/BookDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/dto/BookDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/exception/APIError.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/exception/APIError.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/exception/AuthorInUseException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/exception/AuthorInUseException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/exception/NotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/exception/NotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/model/Author.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/model/Author.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/model/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/model/Book.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/repository/AuthorRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/repository/AuthorRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/repository/BookRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/repository/BookRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/service/AuthorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/service/AuthorService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/service/BookService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/library/example/libraryEdu/service/BookService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/additional-spring-configuration-metadata.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/V00001__init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/db/migration/V00001__init.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/css/styles.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -116,7 +134,13 @@
       <workItem from="1730452620373" duration="40649000" />
       <workItem from="1730897296656" duration="19000" />
       <workItem from="1730897337598" duration="99000" />
-      <workItem from="1730897444284" duration="2206000" />
+      <workItem from="1730897444284" duration="4147000" />
+      <workItem from="1731573963029" duration="3345000" />
+      <workItem from="1731658900351" duration="3254000" />
+      <workItem from="1731920897305" duration="22125000" />
+      <workItem from="1732090598656" duration="3255000" />
+      <workItem from="1732095560924" duration="1900000" />
+      <workItem from="1732097494815" duration="442000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit: Spring Boot CRUD application with PostgreSQL">
       <option name="closed" value="true" />

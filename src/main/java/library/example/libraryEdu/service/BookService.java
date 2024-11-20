@@ -1,30 +1,25 @@
 package library.example.libraryEdu.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import library.example.libraryEdu.dto.AuthorDTO;
 import library.example.libraryEdu.dto.BookDTO;
 import library.example.libraryEdu.exception.NotFoundException;
 import library.example.libraryEdu.model.Author;
 import library.example.libraryEdu.model.Book;
-import library.example.libraryEdu.repository.AuthorRepository;
 import library.example.libraryEdu.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BookService {
-
     private final BookRepository bookRepository;
-    private final AuthorRepository authorRepository;
+    private final AuthorService authorService;
 
     private BookDTO convertToDTO(Book book) {
-        Author author = book.getAuthor();
-        AuthorDTO authorDTO = new AuthorDTO(author.getFirstname(), author.getLastname(), author.getBirthdate());
-        return new BookDTO(book.getTitle(), book.getYear(), book.getGenre(), authorDTO);  // Используем genre
+        AuthorDTO authorDTO = authorService.getAuthorById(book.getAuthorId());
+        return new BookDTO(book.getTitle(), book.getYear(), book.getGenre(), authorDTO);
     }
 
     public List<BookDTO> getAllBooks() {
@@ -33,38 +28,19 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<BookDTO> getBookById(Long id) {
-        return bookRepository.findById(id)
-                .map(this::convertToDTO);
-    }
-
-    private Author findOrCreateAuthor(AuthorDTO authorDTO) {
-        return authorRepository.findByFirstnameAndLastname(authorDTO.getFirstname(), authorDTO.getLastname())
-                .orElseGet(() -> {
-                    Author newAuthor = new Author();
-                    newAuthor.setFirstname(authorDTO.getFirstname());
-                    newAuthor.setLastname(authorDTO.getLastname());
-                    newAuthor.setBirthdate(authorDTO.getBirthdate());
-                    return authorRepository.save(newAuthor);
-                });
+    public BookDTO getBookById(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Book with id " + id + " not found"));
+        return convertToDTO(book);
     }
 
     public BookDTO createBook(BookDTO bookDTO, String genre) {
-        Author author = findOrCreateAuthor(bookDTO.getAuthor());
-
+        Author author = authorService.findOrCreateAuthor(bookDTO.getAuthor());
         Book book = new Book();
         book.setTitle(bookDTO.getTitle());
         book.setYear(bookDTO.getYear());
-        book.setGenre(bookDTO.getGenre());
-        book.setAuthor(author);
-
-        if (genre != null && !genre.isEmpty()) {
-            book.setGenre(genre);
-        }
-
-        if ("Test Rollback".equals(bookDTO.getTitle())) {
-            throw new RuntimeException("Testing transaction rollback");
-        }
+        book.setGenre(genre != null && !genre.isEmpty() ? genre : bookDTO.getGenre());
+        book.setAuthorId(author.getId());
 
         Book savedBook = bookRepository.save(book);
         return convertToDTO(savedBook);
@@ -84,14 +60,13 @@ public class BookService {
             existingBook.setYear(bookDTO.getYear());
         }
         if (bookDTO.getAuthor() != null) {
-            Author author = findOrCreateAuthor(bookDTO.getAuthor());
-            existingBook.setAuthor(author);
+            Author author = authorService.findOrCreateAuthor(bookDTO.getAuthor());
+            existingBook.setAuthorId(author.getId());
         }
 
         Book updatedBook = bookRepository.save(existingBook);
         return convertToDTO(updatedBook);
     }
-
 
     public void deleteBook(Long bookId) {
         Book book = bookRepository.findById(bookId)
@@ -99,7 +74,4 @@ public class BookService {
 
         bookRepository.delete(book);
     }
-
 }
-
-

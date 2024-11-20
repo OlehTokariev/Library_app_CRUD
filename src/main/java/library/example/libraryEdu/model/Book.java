@@ -1,6 +1,7 @@
 package library.example.libraryEdu.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Data
@@ -9,21 +10,22 @@ import lombok.*;
 @Entity
 @Table(name = "book")
 public class Book {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @Column(nullable = false)
     private String title;
 
+    @NotNull
     @Column(nullable = false)
     private String genre;
 
+    @NotNull
     @Column(nullable = false)
     private int year;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    private Author author;
+    @Column(name = "author_id", nullable = false)
+    private Long authorId;
 }

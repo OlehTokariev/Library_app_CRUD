@@ -1,6 +1,5 @@
 package library.example.libraryEdu.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import library.example.libraryEdu.dto.AuthorDTO;
 import library.example.libraryEdu.exception.AuthorInUseException;
 import library.example.libraryEdu.exception.NotFoundException;
@@ -19,7 +18,7 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
     private AuthorDTO convertToDTO(Author author) {
-        return new AuthorDTO(author.getFirstname(), author.getLastname(), author.getBirthdate());
+        return new AuthorDTO(author.getId(),author.getFirstname(), author.getLastname(), author.getBirthdate());
     }
 
     public List<AuthorDTO> getAllAuthors() {
@@ -28,9 +27,21 @@ public class AuthorService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<AuthorDTO> getAuthorById(Long id) {
-        return authorRepository.findById(id)
-                .map(this::convertToDTO);
+    public AuthorDTO getAuthorById(Long id) {
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
+        return new AuthorDTO(author.getId(), author.getFirstname(), author.getLastname(), author.getBirthdate());
+    }
+
+    public Author findOrCreateAuthor(AuthorDTO authorDTO) {
+        return authorRepository.findByFirstnameAndLastname(authorDTO.getFirstname(), authorDTO.getLastname())
+                .orElseGet(() -> {
+                    Author newAuthor = new Author();
+                    newAuthor.setFirstname(authorDTO.getFirstname());
+                    newAuthor.setLastname(authorDTO.getLastname());
+                    newAuthor.setBirthdate(authorDTO.getBirthdate());
+                    return authorRepository.save(newAuthor);
+                });
     }
 
     public AuthorDTO createAuthor(AuthorDTO authorDTO) {
@@ -41,11 +52,18 @@ public class AuthorService {
             return convertToDTO(existingAuthor.get());
         }
 
+        if (authorDTO.getId() != null && authorRepository.existsById(authorDTO.getId())) {
+            throw new AuthorInUseException("Author with ID " + authorDTO.getId() + " already exists.");
+        }
+
         Author author = new Author();
+        author.setId(authorDTO.getId());
         author.setFirstname(authorDTO.getFirstname());
         author.setLastname(authorDTO.getLastname());
         author.setBirthdate(authorDTO.getBirthdate());
+
         Author savedAuthor = authorRepository.save(author);
+
         return convertToDTO(savedAuthor);
     }
 
@@ -78,4 +96,3 @@ public class AuthorService {
         authorRepository.delete(author);
     }
 }
-

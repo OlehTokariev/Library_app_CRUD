@@ -76,12 +76,10 @@ button {
     color: #ffffff;
 }
 
-
 button:hover {
     background-color: #30bd44;
     color: #ffffff;
 }
-
 
 .footer {
     padding-top: 20px;

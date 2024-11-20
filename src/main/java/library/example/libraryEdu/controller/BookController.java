@@ -1,40 +1,37 @@
 package library.example.libraryEdu.controller;
 
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import library.example.libraryEdu.dto.BookDTO;
 import library.example.libraryEdu.exception.APIError;
 import library.example.libraryEdu.exception.NotFoundException;
-import library.example.libraryEdu.model.Book;
 import library.example.libraryEdu.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
 public class BookController {
-
     private final BookService bookService;
 
     @GetMapping
     public List<BookDTO> getAllBooks() {
         return bookService.getAllBooks();
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
-        return bookService.getBookById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        BookDTO book = bookService.getBookById(id);
+        return ResponseEntity.ok(book);
     }
+
     @PostMapping
-    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO, @RequestParam(required = false) String genre) {
+    public ResponseEntity<BookDTO> createBook(@Valid @RequestBody BookDTO bookDTO, @RequestParam(required = false) String genre) {
         BookDTO createdBook = bookService.createBook(bookDTO, genre);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
     }
@@ -46,9 +43,9 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteBook(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
-        return ResponseEntity.ok("Book with id " + id + " has been successfully deleted.");
+        return ResponseEntity.ok(new HashMap<>());
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -58,4 +55,3 @@ public class BookController {
         return new APIError(exception.getMessage(), HttpStatus.NOT_FOUND.value());
     }
 }
-

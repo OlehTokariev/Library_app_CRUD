@@ -1,27 +1,23 @@
 package library.example.libraryEdu.controller;
 
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import library.example.libraryEdu.dto.AuthorDTO;
 import library.example.libraryEdu.exception.APIError;
 import library.example.libraryEdu.exception.AuthorInUseException;
 import library.example.libraryEdu.exception.NotFoundException;
-import library.example.libraryEdu.model.Author;
 import library.example.libraryEdu.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
-
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/authors")
 @RequiredArgsConstructor
 public class AuthorController {
     private final AuthorService authorService;
-
 
     @GetMapping
     public List<AuthorDTO> getAllAuthors() {
@@ -30,15 +26,14 @@ public class AuthorController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AuthorDTO> getAuthorById(@PathVariable Long id) {
-        return authorService.getAuthorById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        AuthorDTO author = authorService.getAuthorById(id);
+        return ResponseEntity.ok(author);
     }
 
     @PostMapping
-    public ResponseEntity<AuthorDTO> createAuthor(@RequestBody AuthorDTO authorDTO) {
-        AuthorDTO createdAuthor = authorService.createAuthor(authorDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAuthor);
+    public ResponseEntity<AuthorDTO> createAuthor(@Valid @RequestBody AuthorDTO authorDTO) {
+        AuthorDTO savedAuthor = authorService.createAuthor(authorDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAuthor);
     }
 
     @PatchMapping ("/{id}")
@@ -48,9 +43,9 @@ public class AuthorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteAuthor(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteAuthor(@PathVariable Long id) {
         authorService.deleteAuthor(id);
-        return ResponseEntity.ok("Author with id " + id + " has been successfully deleted.");
+        return ResponseEntity.ok(new HashMap<>());
     }
 
     @ExceptionHandler(NotFoundException.class)

@@ -24,4 +24,3 @@ public class APIError {
         return status;
     }
 }
-
