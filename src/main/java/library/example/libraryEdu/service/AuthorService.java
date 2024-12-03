@@ -17,7 +17,12 @@ public class AuthorService {
 
     private final AuthorRepository authorRepository;
     private AuthorDTO convertToDTO(Author author) {
-        return new AuthorDTO(author.getId(),author.getFirstname(), author.getLastname(), author.getBirthdate());
+        return AuthorDTO.builder()
+                .id(author.getId())
+                .firstname(author.getFirstname())
+                .lastname(author.getLastname())
+                .birthdate(author.getBirthdate())
+                .build();
     }
 
     public List<AuthorDTO> getAllAuthors() {
@@ -29,18 +34,18 @@ public class AuthorService {
     public AuthorDTO getAuthorById(Long id) {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
-        return new AuthorDTO(author.getId(), author.getFirstname(), author.getLastname(), author.getBirthdate());
+        return convertToDTO(author);
     }
 
-    public Author findOrCreateAuthor(AuthorDTO authorDTO) {
-        return authorRepository.findByFirstnameAndLastname(authorDTO.getFirstname(), authorDTO.getLastname())
+    public AuthorDTO findOrCreateAuthor(AuthorDTO authorDTO) {
+        return convertToDTO(authorRepository.findByFirstnameAndLastname(authorDTO.getFirstname(), authorDTO.getLastname())
                 .orElseGet(() -> {
                     Author newAuthor = new Author();
                     newAuthor.setFirstname(authorDTO.getFirstname());
                     newAuthor.setLastname(authorDTO.getLastname());
                     newAuthor.setBirthdate(authorDTO.getBirthdate());
                     return authorRepository.save(newAuthor);
-                });
+                }));
     }
 
     public AuthorDTO createAuthor(AuthorDTO authorDTO) {
@@ -51,12 +56,7 @@ public class AuthorService {
             return convertToDTO(existingAuthor.get());
         }
 
-        if (authorDTO.getId() != null && authorRepository.existsById(authorDTO.getId())) {
-            throw new AuthorInUseException("Author with ID " + authorDTO.getId() + " already exists.");
-        }
-
         Author author = new Author();
-        author.setId(authorDTO.getId());
         author.setFirstname(authorDTO.getFirstname());
         author.setLastname(authorDTO.getLastname());
         author.setBirthdate(authorDTO.getBirthdate());

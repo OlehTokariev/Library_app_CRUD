@@ -3,11 +3,12 @@ package library.example.libraryEdu.service;
 import library.example.libraryEdu.dto.AuthorDTO;
 import library.example.libraryEdu.dto.BookDTO;
 import library.example.libraryEdu.exception.NotFoundException;
-import library.example.libraryEdu.model.Author;
 import library.example.libraryEdu.model.Book;
 import library.example.libraryEdu.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,11 +36,11 @@ public class BookService {
     }
 
     public BookDTO createBook(BookDTO bookDTO, String genre) {
-        Author author = authorService.findOrCreateAuthor(bookDTO.getAuthor());
+        AuthorDTO author = authorService.findOrCreateAuthor(bookDTO.getAuthor());
         Book book = new Book();
         book.setTitle(bookDTO.getTitle());
         book.setYear(bookDTO.getYear());
-        book.setGenre(genre != null && !genre.isEmpty() ? genre : bookDTO.getGenre());
+        book.setGenre(StringUtils.hasText(genre) ? genre : bookDTO.getGenre());
         book.setAuthorId(author.getId());
 
         Book savedBook = bookRepository.save(book);
@@ -60,7 +61,7 @@ public class BookService {
             existingBook.setYear(bookDTO.getYear());
         }
         if (bookDTO.getAuthor() != null) {
-            Author author = authorService.findOrCreateAuthor(bookDTO.getAuthor());
+            AuthorDTO author = authorService.findOrCreateAuthor(bookDTO.getAuthor());
             existingBook.setAuthorId(author.getId());
         }
 
